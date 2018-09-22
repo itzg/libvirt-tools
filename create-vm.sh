@@ -3,11 +3,12 @@
 set -e
 
 ipAddress=192.168.0.150
+release=bionic
 netmaskSize=24
 gateway=192.168.0.1
 dns1=1.1.1.1
 dns2=1.0.0.1
-hostname=xenial
+hostname=${release}-1
 defaultPassword=passw0rd
 memoryUnits=GiB
 memory=2
@@ -26,6 +27,7 @@ and the name of the libvirt domain. The default is ${hostname}.
 
 OPTIONS
     --ip-address ${ipAddress}
+    --release ${release}
     --netmask-size ${netmaskSize}
     --gateway ${gateway}
     --network-dev ${networkDevice}
@@ -52,6 +54,10 @@ while [[ $# -ge 1 ]]; do
       ;;
     --ip-address)
       ipAddress=$1
+      shift
+      ;;
+    --release)
+      release=$1
       shift
       ;;
     --netmask-size)
@@ -113,8 +119,15 @@ imagesDir=/var/lib/libvirt/images
 netconfig=/tmp/network-config-$$.yml
 userdata=/tmp/user-data-$$.yml
 domainXml=/tmp/domain-$$.yml
-baseImgUrl=https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
-baseImgName=xenial-server-cloudimg-amd64-disk1.img
+case ${release} in
+  xenial)
+    baseImgUrl=https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
+    ;;
+  bionic)
+    baseImgUrl=http://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
+    ;;
+esac
+baseImgName=${release}-server-cloudimg-amd64.img
 extraDevices=
 
 writeNetworkConfig() {
